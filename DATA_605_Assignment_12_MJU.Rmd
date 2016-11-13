@@ -1,0 +1,79 @@
+---
+title: "DATA_605_Assignment_12"
+author: "Md Jalal Uddin"
+date: "November 13, 2016"
+output: html_document
+---
+
+Problem:Using the stats and boot libraries in R perform a cross-validation experiment to observe the bias variance tradeoff. You'll use the auto data set from previous assignments. This dataset has 392 observations across 5 variables. We want to fit a polynomial model of
+various degrees using the glm function in R and then measure the cross validation error
+using cv.glm function. Fit various polynomial models to compute mpg as a function of the other four variables acceleration, weight, horsepower, and displacement using glm function.
+will fit a 2nd degree polynomial function between mpg and the remaining 4 variables and
+perform 5 iterations of cross-validations.
+
+Solution:
+
+```{r}
+#Load packages stats, boot, and dplyr
+library(stats)
+library(boot)
+library(dplyr)
+
+```
+
+
+```{r}
+#read auto-mpg data using read.csv and name the variable using names function. 
+
+auto_mpg_data2 <- read.csv("C:/Users/sql_ent_svc/Desktop/MSDA Assignment/DATA_605/Assignment_11/auto-mpg.data", sep = "", header = FALSE)
+
+names(auto_mpg_data2) = c("mpg", "displacement", "horsepower", "weight", "acceleration")
+
+```
+
+
+```{r}
+# fit a polynomial model of auto-mpg data using glm function. 
+glm.fit = glm(mpg ~ poly(displacement + horsepower + weight + acceleration, 2), data = auto_mpg_data2)
+
+# fit a polynomial model of degree 1 to 8 using glm function.Here we fit 2nd degree polynomial function between mpg and other variables. We performed here 5 iteration with cross-validation. 
+
+degree = 1:8
+cv.err5 = c()
+
+for(i in degree) {
+  glm.fit = glm(mpg ~ poly(displacement + horsepower + weight + acceleration, i), data = auto_mpg_data2)
+  cv.err5 = c(cv.err5, cv.glm(auto_mpg_data2, glm.fit, K = 5)$delta[1])
+}
+
+```
+
+Problem: Once you have fit the various polynomials from degree 1 to 8, you can plot the crossvalidation error function
+
+Solution:
+
+```{r}
+#fit crossvalidation error function with degree 1 to 8
+plot(degree, cv.err5, type = 'b')
+
+```
+
+```{r}
+# Now, I will test with larger degree. Fitting a polynomial model of degree 1 to 17 using glm function and finally fitting crossvalidation error function of this polynomial model. 
+
+degree = 1:17
+cv.err5 = c()
+
+for(i in degree) {
+  glm.fit = glm(mpg ~ poly(displacement + horsepower + weight + acceleration, i), data = auto_mpg_data2)
+  cv.err5 = c(cv.err5, cv.glm(auto_mpg_data2, glm.fit, K = 5)$delta[1])
+}
+
+
+plot(degree, cv.err5, type = 'b')
+
+
+# Conclusion: For 1 to 8 degrees of polynomial model I get U shaped crossvalidation error function but for larger degrees of polynomial model, I get such crossvalidation error function in which error scored have wide variance.   
+
+```
+
